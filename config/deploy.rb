@@ -1,5 +1,5 @@
 # config valid only for current version of Capistrano
-lock '3.5.0'
+#lock '3.5.0'
 
 set :application, 'pi_dashboard'
 set :repo_url, 'https://github.com/EdmondFrank/pi-robot-dashboard.git'
@@ -8,8 +8,8 @@ set :repo_url, 'https://github.com/EdmondFrank/pi-robot-dashboard.git'
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
 
 # Default deploy_to directory is /var/www/my_app_name
-set :deploy_to, "/app/www/#{fetch(:application)}"
-
+#set :deploy_to, "/app/www/#{fetch(:application)}"
+set :deploy_to, "/home/pi/#{fetch(:application)}"
 # Default value for :scm is :git
 set :scm, :git
 
@@ -35,7 +35,7 @@ set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', '
 # Default value for keep_releases is 5
 set :keep_releases, 3
 
-set :rbenv_ruby, File.read('.ruby-version').strip
+#set :rbenv_ruby, File.read('.ruby-version').strip
 
 set :puma_bind, "tcp://0.0.0.0:8080"
 set :puma_threads, [0, 8]
