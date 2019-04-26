@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+source 'https://gems.ruby-china.com'
 
 # a DSL for web applications
 gem 'sinatra', '~> 1.4'

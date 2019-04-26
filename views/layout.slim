@@ -15,10 +15,11 @@ html
     div class="jumbotron"
       div class="container page-header center-block"
         h1 class="text-center"
-          a href="/" 树莓派监控面板
+          a href="/" Raspberry Pi 智能小车
         div class="text-center"
-          - @info.each do |msg|
-            span class="label label-success" = msg
+          h4 class="text-center"
+            - @info.each do |msg|
+              span class="label label-success" = msg
 
     div class="container"
       == yield
@@ -27,5 +28,5 @@ html
     footer class="footer"
       div class="container"
         p class="text-muted text-center"
-          strong Copyright &copy; 2016 
-          a class="label label-primary" href="https://github.com/shawzt" Shawzt
+          strong Copyright &copy; 2019 
+          a class="label label-primary" href="https://EdmomdFrank.github.io" Edmondfrank

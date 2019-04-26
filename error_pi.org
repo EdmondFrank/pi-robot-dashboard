@@ -1,0 +1,5 @@
+* 开发问题
+** An error occurred while installing json (1.8.0), and Bundler cannot continue.
+- delete Gemfile.lock
+** Error occured while installing do_postgres (0.10.16) Bundler canot continue. Make sure 'gem install do_postgress -v '0.10.16' succeeds
+- sudo apt-get install postgresql-9.5 postgresql-server-dev-9.5 libpq-dev

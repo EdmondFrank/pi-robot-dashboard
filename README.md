@@ -1,10 +1,11 @@
-Raspberry Dashboard
+Raspberry Robot Dashboard
 ---
 
-#### This project is for monitoring Raspberry Pi, and it supports the following things:
+#### This project is for monitoring and controlling Raspberry Pi, and it supports the following things:
 + **monitor and show machine temperature**
 + **monitor and show disk usage**
 + **monitor and show running services**
++ **manage raspberry gpio**
 
 #### This project is built by using the following main things:
 + **[Ruby][1]**
@@ -31,12 +32,6 @@ Raspberry Dashboard
   ```
   cap staging deploy
   ```
-
-#### UI:
-+ ![Home Page](/public/assets/images/homepage.png)
-
-+ ![Temperature Page](/public/assets/images/temperature_analysis.png)
-
-+ ![Storage Page](/public/assets/images/storage_analysis.png)
-
-+ ![Service Page](/public/assets/images/service.png)
+#### Reference repository
+[1]: https://github.com/shawzt/pi_dashboard
+[2]: https://github.com/spoonysonny/pi-dashboard
