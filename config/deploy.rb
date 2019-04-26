@@ -2,7 +2,7 @@
 lock '3.5.0'
 
 set :application, 'pi_dashboard'
-set :repo_url, 'https://github.com/shawzt/pi_dashboard.git'
+set :repo_url, 'https://github.com/EdmondFrank/pi-robot-dashboard.git'
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
