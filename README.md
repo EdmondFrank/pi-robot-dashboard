@@ -33,5 +33,5 @@ Raspberry Robot Dashboard
   cap staging deploy
   ```
 #### Reference repository
-[1]: https://github.com/shawzt/pi_dashboard
-[2]: https://github.com/spoonysonny/pi-dashboard
+[pi_dashboard/ruby][https://github.com/shawzt/pi_dashboard]
+[pi-dashboard/php][https://github.com/spoonysonny/pi-dashboard]
