@@ -23,17 +23,18 @@ get '/temperature' do
   startTime = DateTime.now.strftime("%F")
   endTime   = DateTime.now.next.strftime("%F")
   @data = Temperature.all(:created_at => (startTime..endTime), :order => [:id.asc])
+  puts @data
 
   slim :temperature
 end
 
 get '/disk' do
-  info = `df -h / /nas/`.split("\n")
+  info = `df -h / /boot/`.split("\n")
   @headers = []
   info.shift.split(" ").each { |name| @headers << DISK_STATUS_NAME_MAP[name] }
   @items = info.each do |mount|
     mount.gsub!("/dev/root", "Raspberry")
-    mount.gsub!("/dev/sda2", "NAS")
+    mount.gsub!("/dev/mmcblk0p1", "Boot")
   end
 
   slim :disk
