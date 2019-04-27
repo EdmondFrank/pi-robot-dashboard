@@ -1,0 +1,39 @@
+div class="row"
+  h2 class="text-center"
+    span class="label label-success" GPIO状态
+  div class="col-md-offset-1 col-md-10"
+    table class="table table-hover table-bordered"
+      thead
+        tr
+          th 编号
+          th W_id
+          th I/O模式
+          th 当前值
+          th 备注
+      tbody
+        - @pin_datas.each do |item|
+          tr
+            td
+              span class="label label-primary" = item[:id]
+            td
+              strong = item[:w_id]
+            td
+              a.mod.label.label-warning.editable.editable-click[id=item[:id] data-type="select" data-pk=item[:w_id] data-url="/gpio" ] = item[:mode]
+            td
+              a.val.editable.editable-click[id=item[:id] data-type="text" data-pk=item[:w_id] data-url="/gpio" style="color: blue;"] = item[:value]
+            td
+              strong = item[:name]
+javascript:
+
+  $.fn.editable.defaults.mode = 'inline';
+  $(document).ready( function() {
+  $('.val').editable()
+
+  $('.mod').editable( {
+  value: this.text,
+  source: [
+    {value: 'IN', text: 'IN'},
+    {value: 'OUT', text: 'OUT'},
+    ]
+    } )
+ })

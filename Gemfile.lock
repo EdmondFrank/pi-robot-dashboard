@@ -101,6 +101,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
+    rpi_gpio (0.3.3)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -147,6 +148,7 @@ DEPENDENCIES
   pg
   puma
   rake
+  rpi_gpio
   sass
   sinatra (~> 1.4)
   sinatra-contrib

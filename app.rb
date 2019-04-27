@@ -1,5 +1,4 @@
 require 'sinatra/reloader' if development?
-require 'sass'
 
 DISK_STATUS_NAME_MAP = {
   "Filesystem" => "文件系统",
@@ -56,6 +55,28 @@ get '/control' do
 end
 
 get '/gpio' do
+
+  pin_collect = `gpio readall`.split("\n").select do |line|
+    line.split("|").length == 14
+  end
+
+  @pin_datas = pin_collect.reduce([]) do |res, line|
+    v = line.split("|").map{|v|v.strip}
+    res << ({ id: v[6], w_id: v[2], mode: v[4], value: v[5], name: v[3] })
+    res << ({ id: v[8], w_id: v[12], mode: v[10], value: v[9], name: v[11] })
+  end
+
+  slim :gpio
+end
+
+post '/gpio' do
+  puts params
+  return 400 unless params.is_a?(Hash)
+  if params["pk"] =~ /\d+/ && params["value"] =~ /^\d$/
+    `gpio write #{params['pk']} #{params["value"] == "1" ? 1 : 0}`
+  elsif params["pk"] =~ /\d+/ && params["value"] =~ /[IN|OUT]/
+    `gpio mode #{params['pk']} #{params["value"]}`
+  end
 end
 
 get '/start' do
@@ -70,4 +91,8 @@ before do
   time, connections, loads = `uptime`.chomp.split(",",3)
   sys_time, run_time = time.split("up")
   @info = ["系统时间: #{sys_time.strip}", "已运行: #{run_time.strip}", "连接数: #{connections}", "负载: #{loads.strip}"]
+end
+
+error 400 do
+  'Invalid Params'
 end

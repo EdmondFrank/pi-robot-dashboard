@@ -2,6 +2,8 @@ require 'rubygems'
 require 'bundler/setup'
 require 'sinatra'
 require 'slim'
+require 'sass'
+require 'rpi_gpio'
 require './schema'
 require './app'
 
