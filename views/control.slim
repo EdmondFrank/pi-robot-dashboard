@@ -1,0 +1,20 @@
+h1 方向控制
+center
+  div class="arrow-key-container"
+    div class="arrow-key up" data-key="38"
+    br
+    div class="arrow-key left" data-key="37"
+    div class="arrow-key down" data-key="40"
+    div class="arrow-key right" data-key="39"
+javascript:
+
+  window.addEventListener('keyup', arrowUp)
+  window.addEventListener('keydown', arrowDown)
+  function arrowDown(e) {
+    const key = document.querySelector(`.arrow-key[data-key="${e.keyCode}"]`);
+    key.classList.add('press')
+      }
+  function arrowUp(e) {
+    const key = document.querySelector(`.arrow-key[data-key="${e.keyCode}"]`);
+    key.classList.remove('press')
+      }

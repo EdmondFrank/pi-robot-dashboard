@@ -9,7 +9,7 @@ gem 'puma'
 
 # a template language
 gem 'slim', '~> 3.0'
-
+gem 'sass'
 # A scheduler process to replace cron
 gem 'clockwork', '~> 1.2'
 

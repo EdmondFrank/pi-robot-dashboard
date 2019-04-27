@@ -1,1 +1,1 @@
-scp -r ~/ruby/pi_dashboard pi@raspberrypi:~/
+scp -r ~/ruby/pi_dashboard/ pi@raspberrypi:~/

@@ -1,4 +1,5 @@
 require 'sinatra/reloader' if development?
+require 'sass'
 
 DISK_STATUS_NAME_MAP = {
   "Filesystem" => "文件系统",
@@ -60,7 +61,13 @@ end
 get '/start' do
 end
 
+get '/styles.css' do
+  scss :styles
+end
+
 before do
-  /(?<time>\d{2}\:\d{2}(\:\d{2})?)(\s*up\s*)?(?<run_time>(\d*\s*days?\,\s*)?\d{1,2}\:\d{1,2})(\,\s*)?(?<connection>(\d*\susers?)?)(\,\s*)?load\saverages?\:\s*(?<load>[\d\.\,\s]*)/ =~ `uptime`
-  @info = ["系统时间: #{time.strip}", "已运行: #{run_time.strip}", "连接数: #{connection}", "负载: #{load.strip}"]
+  # /(?<time>\d{2}\:\d{2}(\:\d{2})?)(\s*up\s*)?(?<run_time>(\d*\s*days?\,\s*)?\d{1,2}\:\d{1,2})(\,\s*)?(?<connection>(\d*\susers?)?)(\,\s*)?load\saverages?\:\s*(?<load>[\d\.\,\s]*)/ =~ `uptime`
+  time, connections, loads = `uptime`.chomp.split(",",3)
+  sys_time, run_time = time.split("up")
+  @info = ["系统时间: #{sys_time.strip}", "已运行: #{run_time.strip}", "连接数: #{connections}", "负载: #{loads.strip}"]
 end
