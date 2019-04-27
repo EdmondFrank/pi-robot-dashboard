@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'sinatra'
 require 'slim'
+require 'sass'
 require './schema'
 require './app'
 

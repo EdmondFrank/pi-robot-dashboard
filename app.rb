@@ -1,5 +1,4 @@
 require 'sinatra/reloader' if development?
-require 'sass'
 
 DISK_STATUS_NAME_MAP = {
   "Filesystem" => "文件系统",
