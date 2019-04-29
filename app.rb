@@ -13,7 +13,7 @@ SERVICES = {
   "[s]mbd"      => "NAS",
   "[p]uma"      => "监控面板",
   "[c]lockwork" => "温度采集"
-}.freeze
+}
 
 get '/' do
   slim :index
@@ -80,6 +80,15 @@ post '/gpio' do
 end
 
 get '/start' do
+  @command_datas = Command.all
+  slim :start
+end
+
+post '/start' do
+  puts params
+  obj = Command.get(params[:id])
+  pid = Process.spawn(obj['command'])
+  SERVICES[pid] = obj['name']
 end
 
 get '/styles.css' do

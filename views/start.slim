@@ -1,0 +1,38 @@
+div class="row"
+  h2 class="text-center"
+    span class="label label-success" 启动命令面板
+  div class="col-md-offset-1 col-md-10"
+    table class="table table-hover table-bordered"
+      thead
+        tr
+          th 服务名称
+          th 启动命令
+          th 操作
+      tbody
+        - @command_datas.each do |item|
+          tr
+            td
+              strong
+                span.editable[data-type="text"] = item[:name]
+            td
+              a.editable.editable-click[data-type="text" style="color: blue;"] = item[:command]
+            td
+              button.btn.btn-block.btn-primary[id=item[:id]] = "启动"
+
+javascript:
+
+  $.fn.editable.defaults.mode = 'inline';
+  $(document).ready( function() {
+
+  $('.editable').editable()
+
+  $("button").on("click",function() {
+     console.log(this.id)
+  var that = this
+   $.post("/start",{id: this.id}, function(res) {
+   $(that).removeClass("btn-primary")
+   $(that).addClass("btn-danger")
+   $(that).text("停用")
+  })
+  })
+  } );
