@@ -1,3 +1,4 @@
 log
 tmp
 .tags
+.sass-cache/*
