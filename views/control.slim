@@ -1,4 +1,24 @@
-h1 方向控制
+h2 速度设置
+center
+  .row
+    span
+      strong 巡逻速度:
+    input#roundSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="50"]
+  .row
+    span
+      strong 攻击速度:
+    input#attackSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="80"]
+  .row
+    span
+      strong 逃跑速度:
+    input#escapeSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="60"]
+  .row
+    span
+      strong 转弯速度:
+    input#turnSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="40"]
+center
+  .btn.btn-primary.btn-lg#save 保存
+h2 方向控制
 center
   div class="arrow-key-container"
     div class="arrow-key up" data-key="38"
@@ -7,6 +27,26 @@ center
     div class="arrow-key down" data-key="40"
     div class="arrow-key right" data-key="39"
 javascript:
+  $("input").slider({
+        tooltip: 'always'
+        });
+  $("#roundSpeed").on("slide", function(slideEvt) {
+  console.log("roundSpeed: " + slideEvt.value);
+    });
+  $("#attackSpeed").on("slide", function(slideEvt) {
+  console.log("attackSpeed: " + slideEvt.value);
+    });
+  $("#escapeSpeed").on("slide", function(slideEvt) {
+  console.log("escapeSpeed: " + slideEvt.value);
+    });
+  $("#turnSpeed").on("slide", function(slideEvt) {
+  console.log("turnSpeed: " + slideEvt.value);
+    });
+
+  $("#save").on("click",function(){
+  console.log("onclicked")
+    });
+
 
   window.addEventListener('keyup', arrowUp)
   window.addEventListener('keydown', arrowDown)

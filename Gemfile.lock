@@ -77,6 +77,7 @@ GEM
       dm-core (~> 1.2.0)
     do_postgres (0.10.17)
       data_objects (= 0.10.17)
+    eventmachine (1.0.9)
     fastercsv (1.5.5)
     ffi (1.10.0)
     foreman (0.85.0)
@@ -90,6 +91,9 @@ GEM
       net-ssh (>= 2.6.5, < 6.0.0)
     net-ssh (5.2.0)
     pg (1.1.4)
+    pi_piper (2.0.0)
+      eventmachine (= 1.0.9)
+      ffi
     public_suffix (3.0.3)
     puma (3.12.1)
     rack (1.6.11)
@@ -145,6 +149,7 @@ DEPENDENCIES
   dm-postgres-adapter
   foreman
   pg
+  pi_piper
   puma
   rake
   sass
