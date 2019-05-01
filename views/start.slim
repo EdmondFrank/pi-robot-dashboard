@@ -1,6 +1,7 @@
 div class="row"
   h2 class="text-center"
     span class="label label-success" 启动命令面板
+  button#manage.btn.btn-warning.btn-lg[style="float: right;"] +
   div class="col-md-offset-1 col-md-10"
     table class="table table-hover table-bordered"
       thead
@@ -10,29 +11,72 @@ div class="row"
           th 操作
       tbody
         - @command_datas.each do |item|
-          tr
+          tr[id=item[:id]]
             td
               strong
                 span.editable[data-type="text"] = item[:name]
             td
               a.editable.editable-click[data-type="text" style="color: blue;"] = item[:command]
             td
-              button.btn.btn-block.btn-primary[id=item[:id]] = "启动"
+             - if @command_status[item[:id]] === 1
+              button.run.btn.btn-danger[id=item[:id]] = "停用"
+             - else
+              button.run.btn.btn-primary[id=item[:id]] = "启用"
 
 javascript:
 
+  var isEditting = false
   $.fn.editable.defaults.mode = 'inline';
   $(document).ready( function() {
 
   $('.editable').editable()
 
-  $("button").on("click",function() {
+  $("button.run").on("click",function() {
      console.log(this.id)
   var that = this
    $.post("/start",{id: this.id}, function(res) {
-   $(that).removeClass("btn-primary")
-   $(that).addClass("btn-danger")
-   $(that).text("停用")
+   console.log(res)
+     if(res.pid === 1){
+         $(that).removeClass("btn-danger")
+         $(that).addClass("btn-primary")
+         $(that).text("启用")
+       }
+       else {
+         $(that).removeClass("btn-primary")
+         $(that).addClass("btn-danger")
+         $(that).text("停用")
+         }
+      })
   })
-  })
+
+  $("#manage").on("click",function() {
+   if (isEditting) {
+    $(".del").remove()
+    $(this).removeClass("btn-success").addClass("btn-warning").text("+")
+
+    isEditting = false
+    } else {
+    var table_row = '<tr>'
+      + '<td><id="new_name" strong><span class="editable" data-type="text"></span></strong></td>'
+      + '<td><id="new_cmd" a class="editable editable-click" data-type="text" style="color: blue;"></a></td>'
+      + '<td><button class="run btn btn-primary" id="" >启动</button></td>'
+      + '</tr>';
+
+    $("tbody:last").append(table_row);
+  $(".run").each(function() {
+    var del_btn = $("<button>").addClass("del btn btn-danger").text("-").attr("id",this.id)
+      del_btn.on("click",function () {
+        $(this).parent().parent().hide().attr("pre_del",1)
+        })
+      $(this).parent().append(del_btn)
+     })
+
+     $(this).removeClass("btn-warning").addClass("btn-success").text("✔")
+
+     $('body .editable').editable()
+
+     isEditting = true
+    }
+  } )
+
   } );

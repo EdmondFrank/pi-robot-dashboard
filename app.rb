@@ -15,6 +15,10 @@ SERVICES = {
   "[c]lockwork" => "温度采集"
 }
 
+COMMAND_STATUS = {
+  # id => "pid/nil"
+}
+
 get '/' do
   slim :index
 end
@@ -81,14 +85,29 @@ end
 
 get '/start' do
   @command_datas = Command.all
+  @command_status = {}
+  puts COMMAND_STATUS
+  @command_datas.each do |item|
+    @command_status[item[:id]] = COMMAND_STATUS.has_key?(item[:id].to_s) ? 1 : 0
+  end
+  puts @command_status
   slim :start
 end
 
 post '/start' do
   puts params
-  obj = Command.get(params[:id])
-  pid = Process.spawn(obj['command'])
-  SERVICES[pid] = obj['name']
+  if COMMAND_STATUS.has_key?(params[:id]) && COMMAND_STATUS[params[:id]]
+    pid = COMMAND_STATUS[params[:id]]
+    res = Process.kill('INT',pid)
+    COMMAND_STATUS.delete(params[:id])
+    json pid: res, message: "kill process"
+  else
+    obj = Command.get(params[:id])
+    pid = Process.spawn(obj['command'])
+    SERVICES[pid] = obj['name']
+    COMMAND_STATUS[params[:id]] = pid if pid
+    json pid: pid, message: "success"
+  end
 end
 
 get '/styles.css' do
