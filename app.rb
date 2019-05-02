@@ -27,7 +27,6 @@ get '/temperature' do
   startTime = DateTime.now.strftime("%F")
   endTime   = DateTime.now.next.strftime("%F")
   @data = Temperature.all(:created_at => (startTime..endTime), :order => [:id.asc])
-  puts @data
 
   slim :temperature
 end
@@ -74,7 +73,6 @@ get '/gpio' do
 end
 
 post '/gpio' do
-  puts params
   return 400 unless params.is_a?(Hash)
   if params["pk"] =~ /\d+/ && params["value"] =~ /^\d$/
     `gpio write #{params['pk']} #{params["value"] == "1" ? 1 : 0}`
@@ -86,16 +84,26 @@ end
 get '/start' do
   @command_datas = Command.all
   @command_status = {}
-  puts COMMAND_STATUS
   @command_datas.each do |item|
     @command_status[item[:id]] = COMMAND_STATUS.has_key?(item[:id].to_s) ? 1 : 0
   end
-  puts @command_status
+
   slim :start
 end
 
 post '/start' do
-  puts params
+  if params.is_a?(Hash) && params[:name]!="" && params[:cmd]!=""
+  res = Command.create({
+    name: params[:name],
+    command: params[:cmd] })
+  return json id: res.id
+  end
+  status 400
+  json message: "Invalid Params"
+end
+
+
+post '/start/:id' do
   if COMMAND_STATUS.has_key?(params[:id]) && COMMAND_STATUS[params[:id]]
     pid = COMMAND_STATUS[params[:id]]
     res = Process.kill('INT',pid)
@@ -110,12 +118,23 @@ post '/start' do
   end
 end
 
+delete '/start/:id' do
+  if COMMAND_STATUS.has_key?(params[:id]) && COMMAND_STATUS[params[:id]]
+    status 400
+    json message: "服务正在运行，无法删除"
+  else
+    obj = Command.get(params[:id])
+    obj.destroy
+    json message: "删除成功"
+  end
+
+end
+
 get '/styles.css' do
   scss :styles
 end
 
 before do
-  # /(?<time>\d{2}\:\d{2}(\:\d{2})?)(\s*up\s*)?(?<run_time>(\d*\s*days?\,\s*)?\d{1,2}\:\d{1,2})(\,\s*)?(?<connection>(\d*\susers?)?)(\,\s*)?load\saverages?\:\s*(?<load>[\d\.\,\s]*)/ =~ `uptime`
   time, connections, loads = `uptime`.chomp.split(",",3)
   sys_time, run_time = time.split("up")
   @info = ["系统时间: #{sys_time.strip}", "已运行: #{run_time.strip}", "连接数: #{connections}", "负载: #{loads.strip}"]
