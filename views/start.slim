@@ -26,47 +26,87 @@ div class="row"
 javascript:
 
   var isEditting = false
+  var $this = this
   $.fn.editable.defaults.mode = 'inline';
-  $(document).ready( function() {
+  $table = $("tbody")
+  $last =  $("tbody:last")
+  $new_cmd = $("#new_cmd")
+  $new_name = $("#new_name")
 
-  $('.editable').editable()
+  function removeCommand() {
+    var that = this
+    if( $(this).attr("removed") === "1" ) {
+      $.ajax({
+      url: '/start/' + this.id,
+      type: 'DELETE',
+      success: function(result) {
+        that.remove()
+          }
+        });
 
-  $("button.run").on("click",function() {
-     console.log(this.id)
-  var that = this
-   $.post("/start",{id: this.id}, function(res) {
-   console.log(res)
-     if(res.pid === 1){
+      }
+    }
+
+  function createCommand() {
+    var cmd = $new_cmd.text().trim()
+    var name = $new_name.text().trim()
+      if(name !== "Empty" && cmd !== "Empty") {
+        var that = this
+        $.post("/start" , {name: name, cmd: cmd}, function(res) {
+        $new_cmd.parent().parent().attr("id",res.id)
+        $new_cmd.parent().parent().find(".run").attr("id",res.id)
+        $new_cmd.removeAttr("id")
+        $new_name.removeAttr("id")
+        $(".run").on("click",$this.runCommand)
+        })
+        } else {
+        $new_cmd.parent().parent().remove()
+        }
+    }
+
+  function runCommand() {
+    var that = this
+    $.post("/start/"+this.id, function(res) {
+    if(res.pid === 1) {
          $(that).removeClass("btn-danger")
          $(that).addClass("btn-primary")
          $(that).text("启用")
-       }
-       else {
+      } else {
          $(that).removeClass("btn-primary")
          $(that).addClass("btn-danger")
          $(that).text("停用")
          }
-      })
-  })
+    })
+  }
+
+
+  $(document).ready( function() {
+
+  $('.editable').editable()
+
+  $(".run").on("click",$this.runCommand)
 
   $("#manage").on("click",function() {
    if (isEditting) {
     $(".del").remove()
+
+    $table.children().each($this.removeCommand)
+    $this.createCommand()
     $(this).removeClass("btn-success").addClass("btn-warning").text("+")
 
     isEditting = false
     } else {
     var table_row = '<tr>'
-      + '<td><id="new_name" strong><span class="editable" data-type="text"></span></strong></td>'
-      + '<td><id="new_cmd" a class="editable editable-click" data-type="text" style="color: blue;"></a></td>'
-      + '<td><button class="run btn btn-primary" id="" >启动</button></td>'
+      + '<td><strong><span id="new_name" class="editable" data-type="text"></span></strong></td>'
+      + '<td><a id="new_cmd" class="editable editable-click" data-type="text" style="color: blue;"></a></td>'
+      + '<td><button class="run btn btn-primary" id="" >启用</button></td>'
       + '</tr>';
 
-    $("tbody:last").append(table_row);
+   $last.append(table_row);
   $(".run").each(function() {
     var del_btn = $("<button>").addClass("del btn btn-danger").text("-").attr("id",this.id)
       del_btn.on("click",function () {
-        $(this).parent().parent().hide().attr("pre_del",1)
+        $(this).parent().parent().hide().attr("removed",1)
         })
       $(this).parent().append(del_btn)
      })
@@ -74,7 +114,8 @@ javascript:
      $(this).removeClass("btn-warning").addClass("btn-success").text("✔")
 
      $('body .editable').editable()
-
+     $new_cmd = $("#new_cmd")
+     $new_name = $("#new_name")
      isEditting = true
     }
   } )
