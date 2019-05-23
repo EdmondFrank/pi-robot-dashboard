@@ -34,6 +34,20 @@ motor = {'left_pwm1': 21, 'left_pwm2': 23 ,'right_pwm1' : 26,'right_pwm2' : 24}
 
 # 红外避障传感器-手势启动
 gesture_chan = 38
+
+# 边缘状态
+# 0: 初始化
+# 1: 左后遇到边缘
+# 2: 左前遇到边缘
+# 6: 左边两个均遇到边缘
+# 3: 右前遇到边缘
+# 8: 前面遇到边缘
+# 4: 右后遇到边缘
+# 7: 右边两个均遇到边缘
+# 5: 后面遇到边缘
+edge_status = 0
+
+
 #传感器初始化下降沿激活
 GPIO.setup(list(input_chan), GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
@@ -60,6 +74,8 @@ all_pwm = [left_pwm1, left_pwm2, right_pwm1, right_pwm2]
 # 设定pwm初始值,停车状态
 for i in all_pwm: i.start(0)
 
+def delay(ms):
+    time.sleep(ms)
 
 
 def stop():
@@ -93,7 +109,16 @@ def right(speed):
 
 #手势启动
 def delay_start(time):
-    pass
+    #上台且前进到擂台中央
+    back()
+    delay(1000)
+    stop()
+    up()
+    delay(4000)
+    stop()
+
+    #执行主程序
+    main()
 
 def attack(direction, speed):
     if direction == "left_front":
@@ -129,23 +154,84 @@ def turn_or_attack(direction, speed):
 
 def edge_detect(direction):
     if direction == "left":
-        pass
+        if GPIO.input(e18_d80nk_chan['left_back']) == 0:
+            edge_status = 6
+        elif GPIO.input(e18_d80nk_chan['right']) == 0:
+            edge_status = 8
+        else:
+            edge_status = 2
     elif direction == "right":
-        pass
+        if GPIO.input(e18_d80nk_chan['right_back']) == 0:
+            edge_status = 7
+        elif GPIO.input(e18_d80nk_chan['left']) == 0:
+            edge_status = 8
+        else:
+            edge_status = 3
     elif direction == "left_back":
-        pass
+        if GPIO.input(e18_d80nk_chan['left']) == 0:
+            edge_status = 6
+        elif GPIO.input(e18_d80nk_chan['right_back']) == 0:
+            edge_status = 5
+        else:
+            edge_status = 1
     elif direction == "right_back":
-        pass
-    else:
-        pass
+        if GPIO.input(e18_d80nk_chan['left_back']) == 0:
+            edge_status = 5
+        elif GPIO.input(e18_d80nk_chan['right']) == 0:
+            edge_status = 7
+        else:
+            edge_status = 4
+
+    adjust_robot(edge_status)
+
 
 def platform_detect(item):
     if item == "left":
         pass
-    elif itme == "right":
+    elif item == "right":
         pass
     else:
         pass
+
+def adjust_robot(stauts):
+    if status == 1:
+        # 前进，右转，后退
+        up()
+        delay(400)
+        right()
+        delay(400)
+        back()
+    elif status == 2:
+        # 后退，左转，前进
+        back()
+        delay(400)
+        left()
+        delay(400)
+        up()
+    elif status == 3:
+        #后退，右转，前进
+        back()
+        delay(400)
+        right()
+        delay(400)
+        up()
+    elif status == 4:
+        #前进，左转，后退
+        up()
+        delay(400)
+        left()
+        delay(400)
+        back()
+    elif status == 6:
+        # 右转，前进
+        right()
+        delay(400)
+        up()
+    elif status == 7:
+        # 左转，前进
+        left()
+        delay(400)
+        up()
 #GPIO.setup(37, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 #GPIO.setup(13, GPIO.OUT,initial=GPIO.HIGH)
 
@@ -161,34 +247,38 @@ def platform_detect(item):
 # 灰度识别
 
 # 事件监听 - 下降沿触发
-#手势启动
-GPIO.add_event_detect(gesture_chan, GPIO.DOWN, callback=lambda : delay_start(time.time))
-# 前端红外传感器识别响应
-for direction in ["left_front", "front_1", "front_2", "right_front"]:
-    GPIO.add_event_detect(infrared_chan[direction], GPIO.DOWN, callback=lambda : attack(direction,500))
+#手势启动-防抖时间4s
+GPIO.add_event_detect(gesture_chan, GPIO.DOWN, callback=lambda : delay_start(time.time), bouncetime=4000)
 
-# 后方红外传感器识别响应
-for direction in ["back_1, back_2"]:
-    GPIO.add_event_detect(infrared_chan[direction], GPIO.DOWN, callback=lambda : escape(direction,800))
 
-# 左右红外传感器识别响应
-for direction in ["left", "right"]:
-    GPIO.add_event_detect(infrared_chan[direction], GPIO.DOWN, callback=lambda : turn_or_attack(direction,400))
+def main():
+    # 前端红外传感器识别响应
+    for direction in ["left_front", "front_1", "front_2", "right_front"]:
+        GPIO.add_event_detect(infrared_chan[direction], GPIO.FALLING, callback=lambda : attack(direction,500))
 
-#e18_d80nk_chan = {'left' : 31, 'right' : 29, 'left_back' : 36, 'right_back' : 32}
-for direction in e18_d80nk_chan.values():
-     GPIO.add_event_detect( e18_d80nk_chan[direction], GPIO.DOWN, callback=lambda : edge_detect(direction))
+    # 后方红外传感器识别响应
+    for direction in ["back_1, back_2"]:
+        GPIO.add_event_detect(infrared_chan[direction], GPIO.FALLING, callback=lambda : escape(direction,800))
 
-for item in grayscale_chan.values():
-    GPIO.add_event_detect(grayscale_chan[item], GPIO.DOWN, callback=lambda : platform_detect(item))
+    # 左右红外传感器识别响应
+    for direction in ["left", "right"]:
+        GPIO.add_event_detect(infrared_chan[direction], GPIO.FALLING, callback=lambda : turn_or_attack(direction,400))
 
-while True:
-    try:
-        time.sleep(1)
-        #print "Waiting for falling edge on port 23"
-        #GPIO.wait_for_edge(15, GPIO.FALLING)
-        #print "Falling edge detected. Here endeth the second lesson."
-    except KeyboardInterrupt:
-        GPIO.cleanup()       # clean up GPIO on CTRL+C exit
+    #e18_d80nk_chan = {'left' : 31, 'right' : 29, 'left_back' : 36, 'right_back' : 32}
+    for direction in e18_d80nk_chan.values():
+        GPIO.add_event_detect( e18_d80nk_chan[direction], GPIO.FALLING, callback=lambda : edge_detect(direction))
+
+    for item in grayscale_chan.values():
+        GPIO.add_event_detect(grayscale_chan[item], GPIO.FALLING, callback=lambda : platform_detect(item))
+
+
+    while True:
+        try:
+            time.sleep(1)
+            #print "Waiting for falling edge on port 23"
+            #GPIO.wait_for_edge(15, GPIO.FALLING)
+            #print "Falling edge detected. Here endeth the second lesson."
+        except KeyboardInterrupt:
+            GPIO.cleanup()       # clean up GPIO on CTRL+C exit
         break
 GPIO.cleanup()              # clean up GPIO on normal exit

@@ -130,6 +130,12 @@ delete '/start/:id' do
 
 end
 
+post '/keys' do
+  puts "当前按键为："
+  puts params
+  200
+end
+
 get '/styles.css' do
   scss :styles
 end

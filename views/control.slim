@@ -26,35 +26,55 @@ center
     div class="arrow-key left" data-key="37"
     div class="arrow-key down" data-key="40"
     div class="arrow-key right" data-key="39"
+h2 配置启用
+center
+  .btn.btn-primary.btn-lg#attach 启用手动调试
 javascript:
-  $("input").slider({
-        tooltip: 'always'
-        });
-  $("#roundSpeed").on("slide", function(slideEvt) {
-  console.log("roundSpeed: " + slideEvt.value);
-    });
-  $("#attackSpeed").on("slide", function(slideEvt) {
-  console.log("attackSpeed: " + slideEvt.value);
-    });
-  $("#escapeSpeed").on("slide", function(slideEvt) {
-  console.log("escapeSpeed: " + slideEvt.value);
-    });
-  $("#turnSpeed").on("slide", function(slideEvt) {
-  console.log("turnSpeed: " + slideEvt.value);
-    });
+  var flag = 0
+  $("input").slider({ tooltip: 'always'});
 
-  $("#save").on("click",function(){
+  $("#roundSpeed").on("slide", function(slideEvt) {
+  console.log("roundSpeed: " + slideEvt.value); });
+
+  $("#attackSpeed").on("slide", function(slideEvt) {
+  console.log("attackSpeed: " + slideEvt.value); });
+
+  $("#escapeSpeed").on("slide", function(slideEvt) {
+  console.log("escapeSpeed: " + slideEvt.value);});
+
+  $("#turnSpeed").on("slide", function(slideEvt) {
+  console.log("turnSpeed: " + slideEvt.value); });
+
+  $("#save").on("click", function(){
   console.log("onclicked")
     });
 
+  $("#attach").on("click", function() {
+  if(flag === 0) {
+    $(this).text("停用手动调试")
+    $(this).removeClass("btn-primary")
+    $(this).addClass("btn-danger")
+    flag = 1
+  } else {
+  $(this).text("启用手动调试")
+  $(this).removeClass("btn-danger")
+  $(this).addClass("btn-primary")
+  flag = 0
+    }
+  });
 
   window.addEventListener('keyup', arrowUp)
   window.addEventListener('keydown', arrowDown)
+  var keys = {};
   function arrowDown(e) {
+    keys[e.which] = true;
     const key = document.querySelector(`.arrow-key[data-key="${e.keyCode}"]`);
+    $.post("/keys" , {command: keys})
     key.classList.add('press')
-      }
+  }
   function arrowUp(e) {
     const key = document.querySelector(`.arrow-key[data-key="${e.keyCode}"]`);
+    delete keys[e.which];
+    $.post("/keys" , {command: keys})
     key.classList.remove('press')
-      }
+  }

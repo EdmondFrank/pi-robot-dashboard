@@ -103,13 +103,12 @@ javascript:
       + '</tr>';
 
    $last.append(table_row);
-  $(".run").each(function() {
-    var del_btn = $("<button>").addClass("del btn btn-danger").text("-").attr("id",this.id)
-      del_btn.on("click",function () {
-        $(this).parent().parent().hide().attr("removed",1)
-        })
-      $(this).parent().append(del_btn)
-     })
+   $(".run").each(function() {
+   var del_btn = $("<button>").addClass("del btn btn-danger").text("-").attr("id",this.id)
+     del_btn.on("click",function () {
+       $(this).parent().parent().hide().attr("removed",1) })
+       $(this).parent().append(del_btn)
+      })
 
      $(this).removeClass("btn-warning").addClass("btn-success").text("✔")
 
