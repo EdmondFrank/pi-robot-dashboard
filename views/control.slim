@@ -28,9 +28,11 @@ center
     div class="arrow-key right" data-key="39"
 h2 配置启用
 center
-  .btn.btn-primary.btn-lg#attach 启用手动调试
+  - if @flag === 0
+    .btn.btn-primary.btn-lg#attach 启用手动调试
+  - else
+    .btn.btn-danger.btn-lg#attach 停用手动调试
 javascript:
-  var flag = 0
   $("input").slider({ tooltip: 'always'});
 
   $("#roundSpeed").on("slide", function(slideEvt) {
@@ -50,17 +52,18 @@ javascript:
     });
 
   $("#attach").on("click", function() {
-  if(flag === 0) {
-    $(this).text("停用手动调试")
-    $(this).removeClass("btn-primary")
-    $(this).addClass("btn-danger")
-    flag = 1
+  var that = this
+  $.post("/control" , function(res) {
+  if(res.pid === 1) {
+    $(that).text("启用手动调试")
+    $(that).removeClass("btn-danger")
+    $(that).addClass("btn-primary")
   } else {
-  $(this).text("启用手动调试")
-  $(this).removeClass("btn-danger")
-  $(this).addClass("btn-primary")
-  flag = 0
+    $(that).text("停用手动调试")
+    $(that).removeClass("btn-primary")
+    $(that).addClass("btn-danger")
     }
+    })
   });
 
   window.addEventListener('keyup', arrowUp)
@@ -69,12 +72,12 @@ javascript:
   function arrowDown(e) {
     keys[e.which] = true;
     const key = document.querySelector(`.arrow-key[data-key="${e.keyCode}"]`);
-    $.post("/keys" , {command: keys})
+    $.post("http://raspberrypi:3000/keys" , JSON.stringify({command: keys}))
     key.classList.add('press')
   }
   function arrowUp(e) {
     const key = document.querySelector(`.arrow-key[data-key="${e.keyCode}"]`);
     delete keys[e.which];
-    $.post("/keys" , {command: keys})
+    $.post("http://raspberrypi:3000/keys" , JSON.stringify({command: keys}))
     key.classList.remove('press')
   }

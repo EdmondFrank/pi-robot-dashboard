@@ -15,6 +15,10 @@ SERVICES = {
   "[c]lockwork" => "温度采集"
 }
 
+SETTINGS = {
+  :debug => 0,
+  :pid => nil,
+}
 COMMAND_STATUS = {
   # id => "pid/nil"
 }
@@ -54,8 +58,24 @@ get '/services' do
 end
 
 get '/control' do
+  @flag = SETTINGS[:debug]
   slim :control
 end
+
+post '/control' do
+  if SETTINGS[:pid] == nil
+    SETTINGS[:pid] = Process.spawn("python drive_api.py --speed 50")
+    SETTINGS[:debug] = 1
+    json pid: SETTINGS[:pid], msg: "debug active"
+  else
+    pid = SETTINGS[:pid]
+    res = Process.kill('INT',pid)
+    SETTINGS[:debug] = 0
+    SETTINGS[:pid] = nil
+    json pid: res, message: "debug end"
+  end
+end
+
 
 get '/gpio' do
 
