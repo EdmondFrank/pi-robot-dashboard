@@ -3,21 +3,22 @@ center
   .row
     span
       strong 巡逻速度:
-    input#roundSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="50"]
+    input.slider#roundSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="50"]
   .row
     span
       strong 攻击速度:
-    input#attackSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="80"]
+    input.slider#attackSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="80"]
   .row
     span
       strong 逃跑速度:
-    input#escapeSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="60"]
+    input.slider#escapeSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="60"]
   .row
     span
       strong 转弯速度:
-    input#turnSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="40"]
+    input.slider#turnSpeed[type="text" data-slider-min="10" data-slider-max="100" data-slider-step="5" data-slider-value="40"]
 center
   .btn.btn-primary.btn-lg#save 保存
+
 h2 方向控制
 center
   div class="arrow-key-container"
@@ -26,14 +27,51 @@ center
     div class="arrow-key left" data-key="37"
     div class="arrow-key down" data-key="40"
     div class="arrow-key right" data-key="39"
+
+h2 手势控制
+div
+  form[role="form" action="/gestures" method="post" target="targetIfr"]
+    .form-group
+      label 执行命令
+      select.form-control#cmd[name="cmd"]
+        - @command_datas.each do |item|
+          option[id=item[:id]] = item[:name]
+
+      input#cmd_id[type="hidden" name="id" value=0]
+    .form-group
+      label 引脚监听
+      input#pin[type="number" value=11 min=0 max=40 name="pin"]
+    .form-group
+      label 手势停留时间:
+      input#bouncetime[type="number" value=2 placehodler="手势触发停留时间" name="bouncetime"] (单位：秒)
+      .checkbox
+      input[type="checkbox" name="pull"] 上升沿触发（默认下降沿触发）
+
+    button.btn.btn-success#gestures[type="submit"] 设置/解除停留手势
+
 h2 配置启用
 center
   - if @flag === 0
     .btn.btn-primary.btn-lg#attach 启用手动调试
   - else
     .btn.btn-danger.btn-lg#attach 停用手动调试
+
+iframe[name="targetIfr" style="display:none"]
+
 javascript:
-  $("input").slider({ tooltip: 'always'});
+
+  $select = $("#cmd")
+  $cmd_id = $("#cmd_id")
+
+  $(document).ready(function() {
+  $cmd_id.val($select.find("option:selected").attr("id"))
+  $select.change(function() {
+  $cmd_id.val($select.find("option:selected").attr("id"))
+  })
+  })
+
+  var flag = "#{@flag}"
+  $(".slider").slider({ tooltip: 'always'});
 
   $("#roundSpeed").on("slide", function(slideEvt) {
   console.log("roundSpeed: " + slideEvt.value); });
@@ -58,13 +96,16 @@ javascript:
     $(that).text("启用手动调试")
     $(that).removeClass("btn-danger")
     $(that).addClass("btn-primary")
+    flag = "0"
   } else {
     $(that).text("停用手动调试")
     $(that).removeClass("btn-primary")
     $(that).addClass("btn-danger")
+    flag = "1"
     }
     })
   });
+
 
   window.addEventListener('keyup', arrowUp)
   window.addEventListener('keydown', arrowDown)
@@ -72,12 +113,16 @@ javascript:
   function arrowDown(e) {
     keys[e.which] = true;
     const key = document.querySelector(`.arrow-key[data-key="${e.keyCode}"]`);
-    $.post("http://raspberrypi:3000/keys" , JSON.stringify({command: keys}))
+    if(flag === "1") {
+      $.post("http://raspberrypi:3000/keys" , JSON.stringify({command: keys}))
+    }
     key.classList.add('press')
   }
   function arrowUp(e) {
     const key = document.querySelector(`.arrow-key[data-key="${e.keyCode}"]`);
     delete keys[e.which];
-    $.post("http://raspberrypi:3000/keys" , JSON.stringify({command: keys}))
+    if(flag === "1") {
+      $.post("http://raspberrypi:3000/keys" , JSON.stringify({command: keys}))
+    }
     key.classList.remove('press')
   }

@@ -18,6 +18,7 @@ SERVICES = {
 SETTINGS = {
   :debug => 0,
   :pid => nil,
+  :gestures => -1
 }
 COMMAND_STATUS = {
   # id => "pid/nil"
@@ -58,22 +59,51 @@ get '/services' do
 end
 
 get '/control' do
+  @command_datas = Command.all
   @flag = SETTINGS[:debug]
   slim :control
 end
 
 post '/control' do
+  puts params
   if SETTINGS[:pid] == nil
     SETTINGS[:pid] = Process.spawn("python drive_api.py --speed 50")
     SETTINGS[:debug] = 1
+    SERVICES[SETTINGS[:pid]] = "调试模式"
     json pid: SETTINGS[:pid], msg: "debug active"
   else
     pid = SETTINGS[:pid]
     res = Process.kill('INT',pid)
     SETTINGS[:debug] = 0
     SETTINGS[:pid] = nil
-    json pid: res, message: "debug end"
+    SERVICES.delete(pid)
+    json pid: res, msg: "debug end"
   end
+end
+
+post '/gestures' do
+  puts params
+  pin = params["pin"]
+  exec_id = params["id"]
+  pull = params["pull"] || "down"
+  bouncetime = params["bouncetime"]
+  if SETTINGS[:gestures] == -1
+    SETTINGS[:gestures] =
+      Process.
+        spawn("python gestures.py -p #{pin} -e #{exec_id} -i #{pull}
+  -d #{bouncetime}")
+    puts "启用手势 #{SETTINGS[:gestures]}"
+    SERVICES[SETTINGS[:gestures]] = "手势启动"
+    json pid: SETTINGS[:gestures], msg: "gestures active"
+  else
+    pid = SETTINGS[:gestures]
+    puts "停用手势#{pid}"
+    res = Process.kill('QUIT', pid)
+    SETTINGS[:gestures] = -1
+    SERVICES.delete(pid)
+    json pid: res, msg: "gestures end"
+  end
+
 end
 
 
@@ -126,7 +156,7 @@ end
 post '/start/:id' do
   if COMMAND_STATUS.has_key?(params[:id]) && COMMAND_STATUS[params[:id]]
     pid = COMMAND_STATUS[params[:id]]
-    res = Process.kill('INT',pid)
+    res = Process.kill('QUIT',pid)
     COMMAND_STATUS.delete(params[:id])
     json pid: res, message: "kill process"
   else
@@ -150,11 +180,6 @@ delete '/start/:id' do
 
 end
 
-post '/keys' do
-  puts "当前按键为："
-  puts params
-  200
-end
 
 get '/styles.css' do
   scss :styles
