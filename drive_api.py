@@ -102,7 +102,7 @@ class Motor:
         #self.pwm_right.ChangeDutyCycle(speed)
         #self.pwm_left.ChangeDutyCycle(100)
         self.pwm_left_1.ChangeDutyCycle(0)
-        self.pwm_left_2.ChangeDutyCycle(0)
+        self.pwm_left_2.ChangeDutyCycle(speed)
         self.pwm_right_1.ChangeDutyCycle(speed)
         self.pwm_right_2.ChangeDutyCycle(0)
 
@@ -112,7 +112,19 @@ class Motor:
         self.pwm_left_1.ChangeDutyCycle(speed)
         self.pwm_left_2.ChangeDutyCycle(0)
         self.pwm_right_1.ChangeDutyCycle(0)
+        self.pwm_right_2.ChangeDutyCycle(speed)
+
+    def forward_move(self, speed_left, speed_right):
+        self.pwm_left_1.ChangeDutyCycle(speed_left)
+        self.pwm_left_2.ChangeDutyCycle(0)
+        self.pwm_right_1.ChangeDutyCycle(speed_right)
         self.pwm_right_2.ChangeDutyCycle(0)
+
+    def backward_move(self, speed_left, speed_right):
+        self.pwm_left_1.ChangeDutyCycle(0)
+        self.pwm_left_2.ChangeDutyCycle(speed_left)
+        self.pwm_right_1.ChangeDutyCycle(0)
+        self.pwm_right_2.ChangeDutyCycle(speed_right)
 
     def stop(self):
         """ Set the duty cycle of both control pins to zero

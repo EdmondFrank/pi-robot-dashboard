@@ -1,0 +1,8 @@
+{
+  "up_speed" : 80,
+  "back_speed" : 60,
+  "attack_speed" : 85,
+  "search_speed" : 75,
+  "turn_speed" : 60,
+  "esc_speed" : 70
+}
