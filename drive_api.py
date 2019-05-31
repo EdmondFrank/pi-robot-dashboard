@@ -72,10 +72,14 @@ class Motor:
         GPIO.setup(self.RightForward, GPIO.OUT)
         GPIO.setup(self.RightBackward, GPIO.OUT)
 
-        self.pwm_left_1 = GPIO.PWM(self.LeftForward, 100)
-        self.pwm_left_2 = GPIO.PWM(self.LeftBackward, 100)
-        self.pwm_right_1 = GPIO.PWM(self.RightForward, 100)
-        self.pwm_right_2 = GPIO.PWM(self.RightBackward, 100)
+        # GPIO.output([self.LeftForward, self.LeftBackward, self.RightForward, self.RightBackward], GPIO.HIGH)
+
+
+
+        self.pwm_left_1 = GPIO.PWM(self.LeftForward, 10000)
+        self.pwm_left_2 = GPIO.PWM(self.LeftBackward, 10000)
+        self.pwm_right_1 = GPIO.PWM(self.RightForward, 10000)
+        self.pwm_right_2 = GPIO.PWM(self.RightBackward, 10000)
 
         self.pwm_left_1.start(0)
         self.pwm_left_2.start(0)
@@ -85,10 +89,16 @@ class Motor:
     def forward(self, speed):
         #self.pwm_right.ChangeDutyCycle(speed)
         #self.pwm_left.ChangeDutyCycle(speed)
+
         self.pwm_left_1.ChangeDutyCycle(speed)
         self.pwm_left_2.ChangeDutyCycle(0)
         self.pwm_right_1.ChangeDutyCycle(speed)
         self.pwm_right_2.ChangeDutyCycle(0)
+
+        # GPIO.output(self.LeftForward, GPIO.HIGH)
+        # GPIO.output(self.LeftBackward, GPIO.LOW)
+        # GPIO.output(self.RightForward, GPIO.HIGH)
+        # GPIO.output(self.RightBackward, GPIO.LOW)
 
     def backward(self, speed):
         #self.pwm_right.ChangeDutyCycle(speed)
@@ -98,21 +108,39 @@ class Motor:
         self.pwm_right_1.ChangeDutyCycle(0)
         self.pwm_right_2.ChangeDutyCycle(speed)
 
+        # GPIO.output(self.LeftForward, GPIO.LOW)
+        # GPIO.output(self.LeftBackward, GPIO.HIGH)
+        # GPIO.output(self.RightForward, GPIO.LOW)
+        # GPIO.output(self.RightBackward, GPIO.HIGH)
+
+
     def forward_right(self, speed):
         #self.pwm_right.ChangeDutyCycle(speed)
         #self.pwm_left.ChangeDutyCycle(100)
+        self.pwm_left_1.ChangeDutyCycle(speed)
+        self.pwm_left_2.ChangeDutyCycle(0)
+        self.pwm_right_1.ChangeDutyCycle(0)
+        self.pwm_right_2.ChangeDutyCycle(speed)
+
+        # GPIO.output(self.LeftForward, GPIO.LOW)
+        # GPIO.output(self.LeftBackward, GPIO.HIGH)
+        # GPIO.output(self.RightForward, GPIO.HIGH)
+        # GPIO.output(self.RightBackward, GPIO.LOW)
+
+
+    def forward_left(self, speed):
+        #self.pwm_right.ChangeDutyCycle(100)
+        #self.pwm_left.ChangeDutyCycle(speed)
         self.pwm_left_1.ChangeDutyCycle(0)
         self.pwm_left_2.ChangeDutyCycle(speed)
         self.pwm_right_1.ChangeDutyCycle(speed)
         self.pwm_right_2.ChangeDutyCycle(0)
 
-    def forward_left(self, speed):
-        #self.pwm_right.ChangeDutyCycle(100)
-        #self.pwm_left.ChangeDutyCycle(speed)
-        self.pwm_left_1.ChangeDutyCycle(speed)
-        self.pwm_left_2.ChangeDutyCycle(0)
-        self.pwm_right_1.ChangeDutyCycle(0)
-        self.pwm_right_2.ChangeDutyCycle(speed)
+        # GPIO.output(self.LeftForward, GPIO.HIGH)
+        # GPIO.output(self.LeftBackward, GPIO.LOW)
+        # GPIO.output(self.RightForward, GPIO.LOW)
+        # GPIO.output(self.RightBackward, GPIO.HIGH)
+
 
     def forward_move(self, speed_left, speed_right):
         self.pwm_left_1.ChangeDutyCycle(speed_left)
@@ -135,6 +163,11 @@ class Motor:
         self.pwm_left_2.ChangeDutyCycle(0)
         self.pwm_right_1.ChangeDutyCycle(0)
         self.pwm_right_2.ChangeDutyCycle(0)
+        # GPIO.output(self.LeftForward, GPIO.HIGH)
+        # GPIO.output(self.LeftBackward, GPIO.HIGH)
+        # GPIO.output(self.RightForward, GPIO.HIGH)
+        # GPIO.output(self.RightBackward, GPIO.HIGH)
+
 
 def make_app(settings):
     return tornado.web.Application([
@@ -149,7 +182,7 @@ if __name__ == "__main__":
     args = vars(ap.parse_args())
     #GPIO.cleanup(0)
     GPIO.setmode(GPIO.BOARD)
-    motor = Motor(11, 12, 16, 15)
+    motor = Motor(12, 11, 38, 37)
     log_entries = []
     settings = {'speed':float(args['speed_percent'])}
     app = make_app(settings)

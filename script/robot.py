@@ -1,4 +1,5 @@
--import time
+#coding:utf-8
+import time
 import sys
 import json
 sys.path.append(".")
@@ -28,21 +29,26 @@ def flatten(lst):
 GPIO.setmode(GPIO.BOARD)
 
 #引脚初始化
-# 红外接近开关引脚分配
-infrared_chan = { 'front_1' : 15, 'front_2' : 7,
-                  'left_front' : 13, 'right_front' : 12,
-                  'left' : 19, 'right' : 22 ,
-                  'back_1' : 16, 'back_2' : 18}
-# 灰度传感器引脚分配
-grayscale_chan = { 'left' : 33, 'right' : 37 }
-# 光电传感器引脚分配
-e18_d80nk_chan = {'left_front' : 31, 'right_front' : 29, 'left_back' : 36, 'right_back' : 32}
 
-input_chan = flatten([list(i.values()) for i in [infrared_chan, grayscale_chan, e18_d80nk_chan]])
+# 红外接近开关引脚分配
+# infrared_chan = { 'front_1' : 15, 'front_2' : 7,
+#                   'left_front' : 13, 'right_front' : 12,
+#                   'left' : 19, 'right' : 22 ,
+#                   'back_1' : 16, 'back_2' : 18}
+
+# 灰度传感器引脚分配
+# grayscale_chan = { 'left' : 33, 'right' : 37 }
+
+# 光电传感器引脚分配
+e18_d80nk_chan = {'left_front' : 13, 'right_front' : 16, 'left_back' : 18, 'right_back' : 22}
+
+#input_chan = flatten([list(i.values()) for i in [infrared_chan, grayscale_chan, e18_d80nk_chan]])
+
+input_chan = flatten([list(i.values()) for i in [e18_d80nk_chan]])
 
 # 电机Pwm引脚分配＋电机初始化
 #GPIO.PWM(channel,frequent)
-motor = Motor(21,23,26,24)
+motor = Motor(12,11,38,37)
 
 #motor = {'left_pwm1': 21, 'left_pwm2': 23 ,'right_pwm1' : 26,'right_pwm2' : 24}
 
@@ -132,8 +138,8 @@ def enemy():
 
 
 #传感器初始化下降沿激活
-GPIO.setup(list(input_chan), GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(gesture_chan, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(list(input_chan), GPIO.IN) #pull_up_down=GPIO.PUD_UP)
+#GPIO.setup(gesture_chan, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 settings = init_settings()
 
@@ -190,14 +196,15 @@ class switch(object):
 
 def main():
     #双手手势启动
-    while True:
-        left = GPIO.input(infrared_chan["left"])
-        right = GPIO.input(infrared_chan["right"])
-        if left == 0 and right == 0:
-            break
-        delay(10)
-    #上台
-    go()
+    # while True:
+    #     left = GPIO.input(infrared_chan["left"])
+    #     right = GPIO.input(infrared_chan["right"])
+    #     if left == 0 and right == 0:
+    #         break
+    #     delay(10)
+    # #上台
+    # go()
+    delay(4000)
     motor.stop()
     edge_status = 0
     enemy_status = 0
@@ -210,110 +217,112 @@ def main():
         for case in switch(edge_status):
             if case(0):
                 #没有检测到边缘
-                enemy_status = enemy()
-                for task in switch(enemy_status):
-                    if task(0):
-                        #没有敌人
-                        motor.forward(search_sp)
-                        break
+                # enemy_status = enemy()
+                # for task in switch(enemy_status):
+                #     if task(0):
+                #         #没有敌人
+                #         motor.forward(search_sp)
+                #         break
 
-                    if task(1):
-                        #左前方有敌人
-                        motor.forward_move(turn_sp, search_sp)
-                        check_out()
-                        break
+                #     if task(1):
+                #         #左前方有敌人
+                #         motor.forward_move(turn_sp, search_sp)
+                #         check_out()
+                #         break
 
-                    if task(2):
-                        #右前方有敌人
-                        motor.forward_move(search_sp, turn_sp)
+                #     if task(2):
+                #         #右前方有敌人
+                #         motor.forward_move(search_sp, turn_sp)
 
-                        check_out()
-                        break
+                #         check_out()
+                #         break
 
-                    if task(3):
-                        #正前方有敌人
-                        motor.forward(attack_speed)
-                        check_out()
-                        break
-                    if task(4):
-                        break
-                    if task(5):
-                        break
-                    if task(6):
-                        #正后方有敌人
-                        motor.stop()
-                        motor.forward_right(esc_sp)
-                        delay(300)
-                        break
+                #     if task(3):
+                #         #正前方有敌人
+                #         motor.forward(attack_speed)
+                #         check_out()
+                #         break
+                #     if task(4):
+                #         break
+                #     if task(5):
+                #         break
+                #     if task(6):
+                #         #正后方有敌人
+                #         motor.stop()
+                #         motor.forward_right(esc_sp)
+                #         delay(300)
+                #         break
 
-                    if task(7):
-                        # 正左方有敌人
-                        motor.stop()
-                        motor.forward_left(turn_sp)
-                        delay(300)
-                        break
+                #     if task(7):
+                #         # 正左方有敌人
+                #         motor.stop()
+                #         motor.forward_left(turn_sp)
+                #         delay(300)
+                #         break
 
-                    if task(8):
-                        #正右方有敌人
-                        motor.stop()
-                        motor.forward_right(turn_sp)
-                        delay(300)
-                        break
+                #     if task(8):
+                #         #正右方有敌人
+                #         motor.stop()
+                #         motor.forward_right(turn_sp)
+                #         delay(300)
+                #         break
+                motor.forward(search_sp)
                 break
             if case(1):
                 #左前方检测到边缘
-                motor.stop()
+                #motor.stop()
                 motor.backward_move(search_sp, turn_sp)
                 delay(100)
-                motor.stop()
+                #motor.stop()
                 motor.forward_right(turn_sp)
                 delay(200)
                 break
             if case(2):
                 #右前方检测到边缘
-                motor.stop()
+                #motor.stop()
                 motor.backward_move(turn_sp, search_sp)
                 delay(100)
-                motor.stop()
+                #motor.stop()
                 motor.forward_left(turn_sp)
                 delay(200)
                 break
             if case(3):
                 #前方检测到边缘
-                motor.stop()
+                #motor.stop()
                 motor.backward(esc_sp)
                 delay(100)
                 motor.forward_left(turn_sp)
-                delay(500)
+                delay(200)
                 break
             if case(4):
                 #左后方检测到边缘
-                motor.stop()
+                #motor.stop()
                 motor.forward_move(search_sp, turn_sp)
                 delay(200)
                 break
             if case(5):
                 #右后方检测到边缘
-                motor.stop()
+                #motor.stop()
                 motor.forward_move(turn_sp, search_sp)
                 delay(200)
                 break
             if case(6):
                 #后方检测到边缘
-                motor.stop()
+                #motor.stop()
                 motor.forward(esc_sp)
                 delay(200)
                 break
             if case(7):
                 #左侧监测到边缘
-                motor.stop()
+                #motor.stop()
                 motor.forward_right(turn_sp)
                 delay(200)
                 break
             if case(8):
                 #右侧监测到边缘
-                motor.stop()
-                motor.forward_right(turn_sp)
+                #motor.stop()
+                motor.forward_left(turn_sp)
+                delay(200)
                 break
             if case():
                 #default

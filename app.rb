@@ -67,7 +67,7 @@ end
 post '/control' do
   puts params
   if SETTINGS[:pid] == nil
-    SETTINGS[:pid] = Process.spawn("python drive_api.py --speed 60")
+    SETTINGS[:pid] = Process.spawn("python drive_api.py --speed 20")
     SETTINGS[:debug] = 1
     SERVICES[SETTINGS[:pid]] = "调试模式"
     json pid: SETTINGS[:pid], msg: "debug active"
